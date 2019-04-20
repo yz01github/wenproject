@@ -16,6 +16,24 @@ body {
 	background-image: url(../pic/bg.jpg);
 }
 </style>
+<script type="text/javascript">
+function login(){
+	var name = document.getElementById("username");
+	var pwd = document.getElementById("password");
+	$.ajax({
+		type:"POST",
+		url:"/rcw/user/login.action",
+		data:{"userName":username,"passWord":password},
+		success:function(msg){
+			if(msg.status==200)
+				window.location.href="/rcw/jsp/index.jsp";
+			else 
+				alter(msg.message);
+		}
+	})
+};
+
+</script>
 </head>
 <body>
 	<div class="big-bg">
@@ -25,7 +43,7 @@ body {
 				<span class="login-account-c">用户登录</span>
 			</div>
 			<div class="user-login">
-				<form action="/rcw/user/login.action" id="form1"
+				<form action="" id="form1"
 					class="inner_form">
 					<div class="form border">
 						<label for="loginName">用户名</label><input class="ipt"
@@ -40,7 +58,7 @@ body {
 					<div>
 						<input id="submit" name="submit" type="submit"
 							class="login-btn __ga__switchTag_loginBtn_001 "
-							value="登录">
+							value="登录" onclick="login()">
 					</div>
 					<div class="login-forget">
 						<p>

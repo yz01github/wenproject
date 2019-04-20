@@ -6,12 +6,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.bs.entity.User;
+import com.bs.result.ResponseResult;
 import com.bs.service.UserService;
 
 @Controller
@@ -20,44 +21,34 @@ public class UserController
 {
 	@Autowired
 	private UserService userService;
-
 	/**
-	 * ��¼
+	 * 登录
 	 * 
 	 * @param request
 	 * @param response
 	 * @throws IOException
 	 */
-	@RequestMapping(value = "/login", method = RequestMethod.POST)
-	public void login(HttpServletRequest request, HttpServletResponse response) throws IOException
+	@PostMapping(value = "/login")
+	public ResponseResult login(@PathVariable User user)
 	{
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
-		response.setContentType("text/html;charset=UTF-8");
-		String userName = request.getParameter("username");
-		User user = userService.findPwdByUserName(userName);
-		String pwd = request.getParameter("password");
-		if (user == null)
+		User userByName = userService.findPwdByUserName(user.getUserName());
+		if (userByName == null)
 		{
-			response.getWriter().print("<script language='javascript'>alert('�û��������ڣ����������룡')</script>");
-			response.setHeader("refresh", "1;" + request.getContextPath() + "/jsp/login.jsp");
-		} else if (!pwd.equals(user.getPassWord()))
-		{
-			response.getWriter().print("<script language='javascript'>alert('����������������룡')</script>");
-			response.setHeader("refresh", "1;" + request.getContextPath() + "/jsp/login.jsp");
-		} else
-		{
-			request.getSession().setAttribute("user", user);
-			response.setHeader("refresh", "1;" + request.getContextPath() + "/jsp/index.jsp");
+			return ResponseResult.failAddMessage("用户名不存在！");
 		}
+		if (!userByName.getPassWord().equals(user.getPassWord()))
+		{
+			return ResponseResult.failAddMessage("密码错误！");
+		} 
+		return ResponseResult.success();
 	}
-
 	/**
 	 * ��������
 	 * 
 	 * @param request
 	 * @param response
 	 * @throws IOException
+	 * 
 	 */
 	@RequestMapping("/resetPwd")
 	public void register(HttpServletRequest request, HttpServletResponse response) throws IOException
